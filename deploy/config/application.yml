@@ -1,0 +1,65 @@
+spring:
+  datasource:
+    driver-class-name: org.sqlite.JDBC
+    url: jdbc:sqlite:${configPath}//dsreport.sqlite
+    hikari:
+      maximum-pool-size: 1
+      connectionTimeout: 60000
+      idleTimeout: 600000
+      maxLifetime: 3600000
+      
+  jpa:
+    database-platform: com.enigmabridge.hibernate.dialect.SQLiteDialect
+    properties:
+      hibernate:
+        dialect: com.enigmabridge.hibernate.dialect.SQLiteDialect
+        format_sql: true
+
+spring.jpa.properties.hibernate.jdbc.lob.non_contextual_creation: true
+spring.jpa.properties.hibernate.dialect: com.enigmabridge.hibernate.dialect.SQLiteDialect
+spring.jpa.hibernate.cache.use_second_level_cache: true
+spring.jpa.hibernate.cache.use_query_cache: true
+spring.jpa.hibernate.cache.region.factory_class: org.hibernate.cache.ehcache.EhCacheRegionFactory
+
+shell:
+  out:
+    info: CYAN
+    success: GREEN
+    warning: YELLOW
+    error: RED
+              
+app:
+   esignAPIVersion: v2.1
+   clickAPIVersion: v1
+   roomsAPIVersion: v2
+   clmAPIVersion: v201411
+   clmAuthAPIVersion: v201606
+   clickAPIEndPoint: clickapi
+   clmAPIUserEndPoint: apiuser
+   esignAPIAccountUsersEndpoint: users
+   esignAPIDocumentsEndpoint: documents
+   orgAdminAPIBaseUrl: https://api-d.docusign.net/management/v2/organizations
+   roomsAPIBaseUrl: 
+   clmAPIBaseUrl: 
+   clmAuthAPIBaseUrl: 
+   totalRowsPerProcess: 10
+   apiThresholdLimitPercent: 10
+   ruleEngineJsonFilePath: ${configPath}//ruleEngine.json
+   createTablesJsonFilePath: ${configPath}//createTables.json
+   async:
+        executornameprefix: DSExecutor-
+        corepoolsize: 10
+        maxpoolsize: 50
+        queuecapacity: 9999999
+   db:
+     auditorname: ReportApp
+   authorization:
+     rsaPrivateKeyPath: ${configPath}//ds-private.key
+     rsaPublicKeyPath: ${configPath}//ds-public.key
+     aud: account-d.docusign.com
+     integratorKey: 79c1d803-8ff2-466a-aefb-21b5246b6260
+     scopes: impersonation signature
+     userId: 87b00103-461d-487b-8928-1991dfdb8d19
+     token:
+           expirationSeconds: 3600
+           cacheExpirationSeconds: 1800

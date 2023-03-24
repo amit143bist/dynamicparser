@@ -1,0 +1,76 @@
+{
+	"tableDefinitions": [
+		{
+			"tableName": "reportdata",
+			"columns": [
+				{
+					"columnName": "recordid",
+					"columnType": "TEXT NOT NULL"
+				},
+				{
+					"columnName": "createddatetime",
+					"columnType": "INTEGER NOT NULL"
+				},
+				{
+					"columnName": "createdby",
+					"columnType": "TEXT NOT NULL"
+				},
+				{
+					"columnName": "accountid",
+					"columnType": "TEXT NOT NULL"
+				},
+				{
+					"columnName": "batchid",
+					"columnType": "TEXT NOT NULL"
+				},
+				{
+					"columnName": "processid",
+					"columnType": "TEXT NOT NULL"
+				},
+				{
+					"columnName": "employeeid",
+					"columnType": "TEXT NOT NULL",
+					"csvHeaderName": "EmployeeId"
+				},
+				{
+					"columnName": "senderemail",
+					"columnType": "TEXT NOT NULL",
+					"csvHeaderName": "Sender Email"
+				},
+				{
+					"columnName": "sendername",
+					"columnType": "TEXT NOT NULL",
+					"csvHeaderName": "Sender Name"
+				},
+				{
+					"columnName": "envelopeid",
+					"columnType": "TEXT NOT NULL",
+					"csvHeaderName": "EnvelopeId"
+				},
+				{
+					"columnName": "sentdate",
+					"columnType": "INTEGER NOT NULL",
+					"csvHeaderName": "Sent Date"
+				},
+				{
+					"columnName": "recipientcount",
+					"columnType": "INTEGER NOT NULL",
+					"csvHeaderName": "Recipient Count"
+				},
+				{
+					"columnName": "documentcount",
+					"columnType": "INTEGER NOT NULL",
+					"csvHeaderName": "Document Count"
+				},
+				{
+					"columnName": "pagescount",
+					"columnType": "INTEGER NOT NULL",
+					"csvHeaderName": "Pages Count"
+				}
+			],
+			"primaryKey": [
+				"recordid"
+			]
+		}
+	]
+}

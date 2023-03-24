@@ -1,0 +1,370 @@
+{
+	"prepareDataAPIs": [
+		{
+			"apiId": 1,
+			"apiCategory": "esignAPI",
+			"apiOperationType": "GET",
+			"apiUri": "/accounts/{inputAccountId}/envelopes?from_date={inputFromDate}&to_date={inputToDate}&include=recipients,documents,custom_fields&folder_types=inbox,sentitems&count=100",
+			"apiDataTableName": "reportdata",
+			"apiNextPaginationPath": ".nextUri",
+			"apiTotalSetSizePath": ".totalSetSize",
+			"apiParams": [
+				{
+					"paramName": "inputAccountId"
+				},
+				{
+					"paramName": "inputFromDate"
+				},
+				{
+					"paramName": "inputToDate"
+				}
+			],
+			"commonFilters": [
+				{
+					"filterId": "1",
+					"path": "$.envelopes[*]"
+				},
+				{
+					"filterId": "2",
+					"path": ".sentDateTime",
+					"pathOutputDataType": "Text",
+					"pathInputDataPattern": "yyyy-MM-dd'T'HH:mm:ss.SSSSSSS'Z'",
+					"expression": "($ <= inputFromDate && $ >= inputToDate)",
+					"evaluateValue": "true",
+					"pathParams": [
+						{
+							"paramName": "inputFromDate",
+							"paramDataType": "DateTime"
+						},
+						{
+							"paramName": "inputToDate",
+							"paramDataType": "DateTime"
+						}
+					]
+				}
+			],
+			"outputColumns": [
+				{
+					"columnName": "accountid",
+					"columnPath": "inputAccountId",
+					"columnDataType": "Input"
+				},
+				{
+					"columnName": "envelopeid",
+					"columnPath": ".envelopeId"
+				},
+				{
+					"columnName": "sentdate",
+					"columnPath": ".sentDateTime",
+					"columnDataType": "DateTime"
+				},
+				{
+					"columnName": "completeddate",
+					"columnPath": ".completedDateTime",
+					"columnDataType": "DateTime"
+				},
+				{
+					"columnName": "status",
+					"columnPath": ".status"
+				},
+				{
+					"columnName": "recipientcount",
+					"columnPath": ".recipients.recipientCount",
+					"columnDataType": "Number"
+				},
+				{
+					"columnName": "recipients",
+					"columnPath": ".recipients",
+					"decorateOutput":{
+						"outputPatternExpression":"function decorateRecipients($) {var results = {recipientsArray: []};if ($.signers == null || $.signers === undefined || typeof $.signers === 'undefined') {return null;}else{for (var j = 0; j < $.signers.length; j++) {if(!($.signers[j].email == null || $.signers[j].email === undefined || typeof $.signers[j].email === 'undefined')){results.recipientsArray.push({userId : $.signers[j].userId,userEmail : $.signers[j].email});}}}return JSON.stringify(results);}",
+						"pathParams": [
+							{
+								"paramName": "functionName",
+								"paramValue": "decorateRecipients"
+							}
+						]
+					}
+				},
+				{
+					"columnPath": ".envelopeId",
+					"associatedData": {
+						"apiId": "2",
+						"apiUri": "/accounts/{inputAccountId}/envelopes/{envelopeId}/audit_events",
+						"apiCategory": "esignAPI",
+						"apiOperationType": "GET",
+						"saveDataInCache": "false",
+						"apiParams": [
+							{
+								"paramName": "inputAccountId"
+							},
+							{
+								"paramName": "envelopeId"
+							}
+						],
+						"commonFilters": [
+							{
+								"filterId": "3",
+								"path": "$"
+							}
+						],
+						"outputColumns": [
+							{
+								"columnName": "geolocationdetails",
+								"columnPath": ".auditEvents[*]",
+								"decorateOutput":{
+									"outputPatternExpression":"function decorateGeoData($, recipients) {var signedEventFields = [];var userIdGeoLocationMap = '';var parsedRecipientJSON = null;if (!(recipients == null || recipients === undefined || typeof recipients === 'undefined')) {parsedRecipientJSON = JSON.parse(recipients);}if ($ == null || $ === undefined || typeof $ === 'undefined') {return null;} else {for (var j = 0; j < $.length; j++) {if (!($[j].eventFields == null || $[j].eventFields === undefined || typeof $[j].eventFields === 'undefined')) {for (var k = 0; k < $[j].eventFields.length; k++) {if ($[j].eventFields[k].name === 'Action' && $[j].eventFields[k].value === 'Signed') {signedEventFields.push($[j]);break;}}}}if (!(signedEventFields == null || signedEventFields === undefined || typeof signedEventFields === 'undefined')) {for (var k = 0; k < signedEventFields.length; k++) {var recipientUserId = null;var recipientGeoLocation = null;var recipientUserName = null;var recipientUserEmail = null;for (var x = 0; x < signedEventFields[k].eventFields.length; x++) {if (signedEventFields[k].eventFields[x].name === 'UserId') {recipientUserId = signedEventFields[k].eventFields[x].value;}if (signedEventFields[k].eventFields[x].name === 'GeoLocation') {if (signedEventFields[k].eventFields[x].value === '') {recipientGeoLocation = 'OptOut';} else {recipientGeoLocation = 'OptIn';}}if (signedEventFields[k].eventFields[x].name === 'UserName') {recipientUserName = signedEventFields[k].eventFields[x].value;}if (!(parsedRecipientJSON == null || parsedRecipientJSON === undefined || typeof parsedRecipientJSON === 'undefined')) {for (var z = 0; z < parsedRecipientJSON.recipientsArray.length; z++) {if (parsedRecipientJSON.recipientsArray[z].userId === recipientUserId) {recipientUserEmail = parsedRecipientJSON.recipientsArray[z].userEmail;break;}}}}if (!(recipientUserId == null || recipientUserId === undefined || typeof recipientUserId === 'undefined')) {userIdGeoLocationMap = userIdGeoLocationMap + recipientUserName + ':' + recipientUserEmail + ':' + recipientGeoLocation + ',';}}}}return userIdGeoLocationMap.substr(0, userIdGeoLocationMap.length - 1);}",
+									"pathParams": [
+										{
+											"paramName": "functionName",
+											"paramValue": "decorateGeoData"
+										},
+										{
+											"paramName": "recipients"
+										}
+									]
+								}
+							}
+						]
+					}
+				},
+				{
+					"columnName": "documentcount",
+					"columnDataType": "ArraySize",
+					"columnPath": ".envelopeDocuments[?(@.documentId != 'certificate')].documentIdGuid"
+				},
+				{
+					"columnName": "pagescount",
+					"columnDataType": "ArraySize",
+					"columnPath": ".envelopeDocuments[?(@.documentId != 'certificate')].pages[*].pageId"
+				},
+				{
+					"columnName": "billable",
+					"columnPath": ".customFields",
+					"decorateOutput":{
+						"outputPatternExpression":"function decorateCustomFields($) {var output = 'Yes';if ($ == null || $ === undefined || typeof $ === 'undefined') {return output;}if (!($.textCustomFields == null || $.textCustomFields === undefined || typeof $.textCustomFields === 'undefined')) {for (var j = 0; j < $.textCustomFields.length; j++) {if($.textCustomFields[j].value == 'DocuSignIt'){output = 'No';break;}}}return output;}",
+						"pathParams": [
+							{
+								"paramName": "functionName",
+								"paramValue": "decorateCustomFields"
+							}
+						]
+					}
+				},
+				{
+					"columnName": "completionrate",
+					"decorateOutput":{
+						"outputPatternExpression":"function calculateDateTimeDiff(sentdate, completeddate) {var output = null;if (completeddate == null || completeddate === undefined || typeof completeddate === 'undefined') {return output;}var a = new Date(completeddate);var b = new Date(sentdate);return (Math.abs(a - b));}",
+						"pathParams": [
+							{
+								"paramName": "functionName",
+								"paramValue": "calculateDateTimeDiff"
+							},
+							{
+								"paramName": "sentdate"
+							},
+							{
+								"paramName": "completeddate"
+							}
+						]
+					}
+				},
+				{
+					"columnName": "completionvelocity",
+					"decorateOutput":{
+						"outputPatternExpression":"function calculateDateTimeDiff(sentdate, completeddate) {var output = null;if (completeddate == null || completeddate === undefined || typeof completeddate === 'undefined') {return output;}var a = new Date(completeddate);var b = new Date(sentdate);var totalSeconds = (Math.abs(a - b)/1000);var hours = Math.floor(totalSeconds / 3600);totalSeconds = totalSeconds % 3600;var minutes = Math.floor(totalSeconds / 60);var seconds = totalSeconds % 60;output = hours + ':' + minutes + ':' + seconds;return output;}",
+						"pathParams": [
+							{
+								"paramName": "functionName",
+								"paramValue": "calculateDateTimeDiff"
+							},
+							{
+								"paramName": "sentdate"
+							},
+							{
+								"paramName": "completeddate"
+							}
+						]
+					}
+				},
+				{
+					"columnName": "greenimpact",
+					"decorateOutput":{
+						"outputPatternExpression":"function calculateGreenImpact(recipientcount,pagescount){return (recipientcount * pagescount);}",
+						"pathParams": [
+							{
+								"paramName": "functionName",
+								"paramValue": "calculateGreenImpact"
+							},
+							{
+								"paramName": "recipientcount"
+							},
+							{
+								"paramName": "pagescount"
+							}
+						]
+					}
+				},
+				{
+					"columnName": "ecf",
+					"columnPath": ".customFields",
+					"decorateOutput":{
+						"outputPatternExpression":"function decorateCustomFields($){var output='';if($==null||$===undefined||typeof $==='undefined'){return null;}if(!($.textCustomFields==null||$.textCustomFields===undefined||typeof $.textCustomFields==='undefined')){for(var j=0;j<$.textCustomFields.length;j++){output=output+$.textCustomFields[j].name+':'+$.textCustomFields[j].value+','}}if(!($.listCustomFields==null||$.listCustomFields===undefined||typeof $.listCustomFields==='undefined')){for(var j=0;j<$.listCustomFields.length;j++){output=output+$.listCustomFields[j].name+':'+$.listCustomFields[j].value+','}}return output.substr(0,output.length-1);}",
+						"pathParams": [
+							{
+								"paramName": "functionName",
+								"paramValue": "decorateCustomFields"
+							}
+						]
+					}
+				}				
+			],
+			"apiRunArgs": {
+				"batchType": "ESIGNENVELOPELOAD",
+				"completeBatchOnError": true,
+				"pathParams": [
+					{
+						"paramName": "accountsFetchAPIToUse",
+						"paramValue": "USERINFO"
+					}					
+				]
+			}
+		}
+	],
+	"manageDataAPIs": [
+		{
+			"tableName": "reportdata",
+			"selectSql": "select accountid, envelopeid, billable, sentdate, completeddate, status, recipientcount, documentcount, pagescount, completionrate, completionvelocity, greenimpact, geolocationdetails, ecf from reportdata ",
+			"whereClause": "where sentdate between (:inputFromDate) and (:inputToDate) ",
+			"orderByClause": "order by envelopeid asc LIMIT :limit OFFSET :offset ",
+			"groupByColumn": "accountid",
+			"sqlParams": [
+				{
+					"paramName": "inputFromDate",
+					"paramPattern":"yyyy-MM-dd'T'HH:mm:ss.SSSSSSS'Z'",
+					"paramDataType": "DateTime"
+				},
+				{
+					"paramName": "inputToDate",
+					"paramPattern":"yyyy-MM-dd'T'HH:mm:ss.SSSSSSS'Z'",
+					"paramDataType": "DateTime"
+				}
+			],
+			"decorateOutput": [
+				{
+					"dbColumnName": "sentdate",
+					"outputType": "DateTime",
+					"inputDatePattern":"yyyy-MM-dd'T'HH:mm:ss.SSS",
+					"outputDatePattern":"yyyy-MM-dd HH:mm:ss.SSS",
+					"outputDateZone": "EST"
+				},
+				{
+					"dbColumnName": "completeddate",
+					"outputType": "DateTime",
+					"inputDatePattern":"yyyy-MM-dd'T'HH:mm:ss.SSS",
+					"outputDatePattern":"yyyy-MM-dd HH:mm:ss.SSS",
+					"outputDateZone": "EST"
+				},
+				{
+					"dbColumnName": "geolocationdetails",
+					"outputType": "ARRAY",
+					"outputDelimiter": ",",
+					"keyValueDelimiter":":"
+				},
+				{
+					"dbColumnName": "ecf",
+					"outputType": "ArrayMap",
+					"outputDelimiter": ",",
+					"keyValueDelimiter":":"
+				}			
+			],	
+			"downloadDocs":{
+				  "associatedData": {
+						"apiId": 1,
+						"apiCategory":"esignAPI",
+						"apiOperationType": "GET",
+						"apiUri": "/accounts/{inputAccountId}/envelopes/{inputEnvelopeId}/documents/archive",
+						"apiParams":[
+							{	
+								"paramName":"inputAccountId"
+							},
+							{
+								"paramName":"inputEnvelopeId"
+							}
+						]
+				  },
+				  "downloadParams":[
+							{	
+								"paramName":"fileSaveFormat",
+								"paramValue": "archive"
+							},
+							{
+								"paramName":"downloadFolderName",
+								"paramValue": "fn:myFunction"
+							},
+							{
+								"paramName":"myFunction_Definition",
+								"paramValue": "function myFunction(str1,str2){return str1.concat(str2);}"
+							},
+							{
+								"paramName":"myFunction_Params",
+								"paramValue": "envelopeId,status"
+							},
+							{
+								"paramName":"docDownloadDestination",
+								"paramValue": "DISK"
+							},
+							{
+								"paramName":"docDownloadFolderPath",
+								"paramValue": "C:/cbs/alexion/dynamitex/output/docs"
+							},
+							{
+								"paramName":"unzipArchive",
+								"paramValue": "true"
+							},
+							{
+								"paramName":"deleteArchive",
+								"paramValue": "true"
+							},
+							{
+								"paramName":"disableCurrentDateInDocFolderPath",
+								"paramValue": "true"
+							},
+							{
+								"paramName":"disableAccountIdInDocFolderPath",
+								"paramValue": "true"
+							},
+							{
+								"paramName":"accountIdColumnName",
+								"paramValue": "accountid"
+							},
+							{
+								"paramName":"envelopeIdColumnName",
+								"paramValue": "envelopeid"
+							}
+						]
+			},
+			"exportRunArgs": {
+				"batchType": "DOWNLOADREPORTANDDOCUMENTS",
+				"completeBatchOnError": true,
+				"pathParams": [
+					{
+						"paramName": "csvDownloadFolderPath",
+						"paramValue": "C:/cbs/alexion/dynamitex/output"
+					},
+					{
+						"paramName":"reportDataPaginationLimit",
+						"paramValue": "10"
+						
+					},
+					{
+						"paramName":"disableCurrentDateInCSVFolderPath",
+						"paramValue": "true"
+					}
+				]
+			}
+		}
+	],
+	"jobRunArgs": {
+		"completeBatchOnError": true
+	}
+}

@@ -1,0 +1,72 @@
+{
+	"tableDefinitions": [
+		{
+			"tableName": "reportdata",
+			"columns": [
+				{
+					"columnName": "recordid",
+					"columnType": "TEXT NOT NULL"
+				},
+				{
+					"columnName": "createddatetime",
+					"columnType": "INTEGER NOT NULL"
+				},
+				{
+					"columnName": "createdby",
+					"columnType": "TEXT NOT NULL"
+				},
+				{
+					"columnName": "accountid",
+					"columnType": "TEXT NOT NULL",
+					"csvHeaderName": "AccountId"
+				},
+				{
+					"columnName": "batchid",
+					"columnType": "TEXT NOT NULL"
+				},
+				{
+					"columnName": "processid",
+					"columnType": "TEXT NOT NULL"
+				},
+				{
+					"columnName": "envelopeid",
+					"columnType": "TEXT NOT NULL",
+					"csvHeaderName": "EnvelopeId"
+				},
+				{
+					"columnName": "sentdate",
+					"columnType": "INTEGER NOT NULL",
+					"csvHeaderName": "Sent Date"
+				},
+				{
+					"columnName": "recipientcount",
+					"columnType": "INTEGER NOT NULL",
+					"csvHeaderName": "Recipient Count"
+				},
+				{
+					"columnName": "status",
+					"columnType": "TEXT NOT NULL",
+					"csvHeaderName": "Status"
+				},
+				{
+					"columnName": "completeddate",
+					"columnType": "INTEGER",
+					"csvHeaderName": "Completed Date"
+				},
+				{
+					"columnName": "recipients",
+					"columnType": "TEXT",
+					"csvHeaderName": "Recipients"
+				},
+				{
+					"columnName": "geolocationdetails",
+					"columnType": "TEXT",
+					"csvHeaderName": "GeoLocationDetails"
+				}
+			],
+			"primaryKey": [
+				"recordid"
+			]
+		}
+	]
+}

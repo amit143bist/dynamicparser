@@ -1,0 +1,197 @@
+{
+	"prepareDataAPIs": [
+		{
+			"apiId": 1,
+			"apiCategory": "esignAPI",
+			"apiOperationType": "GET",
+			"apiUri": "/accounts/{inputAccountId}/envelopes?from_date={inputFromDate}&to_date={inputToDate}&include=recipients,documents,custom_fields&count=2",
+			"apiDataTableName": "reportdata",
+			"apiNextPaginationPath": ".nextUri",
+			"apiTotalSetSizePath": ".totalSetSize",
+			"apiParams": [
+				{
+					"paramName": "inputAccountId"
+				},
+				{
+					"paramName": "inputFromDate"
+				},
+				{
+					"paramName": "inputToDate"
+				}
+			],
+			"commonFilters": [
+				{
+					"filterId": "1",
+					"path": "$.envelopes[?((!(@.customFields)) || (@.customFields && @.customFields.textCustomFields && @.customFields.textCustomFields.length == 0) || (@.customFields && @.customFields.textCustomFields && 'DocuSignIt' nin @.customFields.textCustomFields[*].value))]"
+				},
+				{
+					"filterId": "2",
+					"path": ".sentDateTime",
+					"pathOutputDataType": "Text",
+					"pathOutputDataPattern": "yyyy-MM-dd'T'HH:mm:ss.SSSSSSS'Z'",
+					"expression": "($ <= inputFromDate && $ >= inputToDate)",
+					"evaluateValue": "true",
+					"pathParams": [
+						{
+							"paramName": "inputFromDate",
+							"paramDataType": "DateTime"
+						},
+						{
+							"paramName": "inputToDate",
+							"paramDataType": "DateTime"
+						}
+					]
+				}
+			],
+			"outputColumns": [
+				{
+					"columnName": "employeeid",
+					"columnPath": ".sender.email",
+					"associatedData": {
+						"apiId": "2",
+						"apiUri": "/{inputOrgId}/users/profile?email={emailId}",
+						"apiCategory": "orgAdminAPI",
+						"apiOperationType": "GET",
+						"saveDataInCache": "true",
+						"apiParams": [
+							{
+								"paramName": "inputOrgId"
+							},
+							{
+								"paramName": "emailId"
+							}
+						],
+						"commonFilters": [
+							{
+								"filterId": "3",
+								"path": "$.users[*].identities[?(@.provider_id == 'cc3ccd3e-9e51-4081-af97-627b3d22ef42')]"
+							},
+							{
+								"filterId": "4",
+								"path": ".immutable_id",
+								"evaluateValue": "true"
+							}
+						]
+					}
+				},
+				{
+					"columnName": "senderemail",
+					"columnPath": ".sender.email"
+				},
+				{
+					"columnName": "sendername",
+					"columnPath": ".sender.userName"
+				},
+				{
+					"columnName": "envelopeid",
+					"columnPath": ".envelopeId"
+				},
+				{
+					"columnName": "sentdate",
+					"columnPath": ".sentDateTime",
+					"columnDataType": "DateTime"
+				},
+				{
+					"columnName": "recipientcount",
+					"columnPath": ".recipients.recipientCount",
+					"columnDataType": "Number"
+				},
+				{
+					"columnName": "documentcount",
+					"columnDataType": "ArraySize",
+					"columnPath": ".envelopeDocuments[?(@.documentId != 'certificate')].documentIdGuid"
+				},
+				{
+					"columnName": "pagescount",
+					"columnDataType": "ArraySize",
+					"columnPath": ".envelopeDocuments[?(@.documentId != 'certificate')].pages[*].pageId"
+				}
+			],
+			"apiRunArgs": {
+				"batchType": "ESIGNENVELOPELOAD",
+				"completeBatchOnError": true,
+				"pathParams": [
+					{
+						"paramName": "inputOrgId",
+						"paramValue": "56b404df-d7ea-4198-b07f-b48bf5b715df"
+					},
+					{
+						"paramName": "accountsFetchAPIToUse",
+						"paramValue": "ORGADMIN"
+					}
+				]
+			}
+		}
+	],
+	"manageDataAPIs": [
+		{
+			"tableName": "reportdata",
+			"selectSql": "select employeeid, senderemail, sendername, envelopeid, sentdate, recipientcount, documentcount, pagescount from reportdata",
+			"whereClause": "where sentdate between ? and ?",
+			"sqlParams": [
+				{
+					"paramName": "inputFromDate",
+					"paramDataType": "DateTime"
+				},
+				{
+					"paramName": "inputToDate",
+					"paramDataType": "DateTime"
+				}
+			],
+			"decorateOutput": [
+				{
+					"dbColumnName": "sentdate",
+					"outputType": "Date",
+					"outputDateZone": "EST"
+				}
+			],
+			"downloadDocs":{
+				  "associatedData": {
+						"apiId": 1,
+						"apiCategory":"esignAPI",
+						"apiOperationType": "GET",
+						"apiUri": "/accounts/{inputAccountId}/envelopes/{inputEnvelopeId}/documents/archive",
+						"apiParams":[
+							{	
+								"paramName":"inputAccountId"
+							},
+							{
+								"paramName":"inputEnvelopeId"
+							}
+						]
+				  },
+				  "downloadParams":[
+							{	
+								"paramName":"fileSaveFormat",
+								"paramValue": "archive"
+							},
+							{
+								"paramName":"downloadFolderName",
+								"paramValue": "envelopeId"
+							},
+							{
+								"paramName":"docDownloadDestination",
+								"paramValue": "DISK"
+							},
+							{
+								"paramName":"docDownloadFolderPath",
+								"paramValue": "C:\\cbs\\csv"
+							}
+						]
+			},
+			"exportRunArgs": {
+				"batchType": "DOWNLOADREPORTANDDOCUMENTS",
+				"completeBatchOnError": true,
+				"pathParams": [
+					{
+						"paramName": "csvDownloadFolderPath",
+						"paramValue": "C:\\cbs\\csv"
+					}
+				]
+			}
+		}
+	],
+	"jobRunArgs": {
+		"completeBatchOnError": true
+	}
+}

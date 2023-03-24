@@ -1,0 +1,50 @@
+docker exec -it oracledb1 bash -c "source /home/oracle/.bashrc; sqlplus /nolog"
+history
+doskey
+doskey /History
+doskey /History > dockercommands.txt
+docker stop sqlserver1
+docker ls
+docker dir
+docker -all
+docker container -all
+docker -help
+docker ps
+docker ps -a
+docker run --name sqlserver1 -d -p 1433:1433 --volume c:\Docker\Volumes\SQLServer:c:\SQLData -e sa_password=DocuSign1! -e ACCEPT_EULA=Y microsoft/mssql-server-windows-developer
+docker ps -a
+docker rm d0d690ecdb4e
+docker ps -a
+docker run --name sqlserver1 -d -p 1433:1433 --volume c:\Docker\Volumes\SQLServer:c:\SQLData -e sa_password=DocuSign1! -e ACCEPT_EULA=Y microsoft/mssql-server-windows-developer
+docker ps -a
+docker pull mysql/mysql-server:latest
+docker ps -a
+docker pull mysql/mysql-server:latest
+docker images
+docker run -d --name=mysql1 -e MYSQL_ROOT_PASSWORD=DocuSign1! -p 3306:3306 --volume C:\Docker\Volumes\MySQL:c:\SQLData mysql
+ps -a
+docker ps -1
+docker ps -a
+docker run -d --name=mysql1 -e MYSQL_ROOT_PASSWORD=DocuSign1! -p 3306:3306 mysql-server
+docker run -d --name=mysql1 -e MYSQL_ROOT_PASSWORD=DocuSign1! -p 3306:3306 mysql
+docker ps -a
+docker exec -it mysql1 mysql -uroot -p
+docker ps -a
+docker stop 1dbe0db5337d
+docker rm 1dbe0db5337d
+docker run -d --name=mysql1 -e MYSQL_ROOT_PASSWORD=DocuSign1! -p 3306:3306 mysql --volume c:\Docker\Volumes\MySQL:/etc/mysql/conf.d
+docker ps -a
+docker run -d --name=mysql1 -e MYSQL_ROOT_PASSWORD=DocuSign1! -p 3306:3306 mysql --volume c:\Docker\Volumes\MySQL:/etc/mysql/conf.d
+docker ps -a
+docker rm 5caeeda65861
+docker run -d --name=mysql1 -e MYSQL_ROOT_PASSWORD=DocuSign1! --volume c:\Docker\Volumes\MySQL:/etc/mysql/conf.d -p 3306:3306 mysql
+docker ps -a
+docker inspect mysql8 | grep MYSQL_MAJOR
+docker inspect mysql8
+docker inspect mysql
+docker login
+docker run -d -it --name oracledb1 -p 1521:1521 -v C:\Docker\Volumes\Oracle:/ORCL store/oracle/database-enterprise:12.2.0.1-slim
+docker ps -a
+docker inspect oracledb1
+cd /host_mnt/c/Docker/Volumes/Oracle
+docker /host_mnt/c/Docker/Volumes/Oracle

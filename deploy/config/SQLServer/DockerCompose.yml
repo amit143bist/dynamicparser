@@ -1,0 +1,11 @@
+version: '3.7'
+services:
+  SQLServer:
+   image: microsoft/mssql-server-windows-developer
+   environment:
+     - ACCEPT_EULA=Y
+     - SA_PASSWORD=DocuSign1!   
+   ports:
+     - '1433:1433'
+   volumes:
+     - c:\Docker\Volumes\SQLServer:c:\SQLData

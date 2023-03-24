@@ -1,0 +1,66 @@
+spring:
+  datasource:
+    driver-class-name: org.sqlite.JDBC
+    url: jdbc:sqlite:src/test/resources/config/dsreport.sqlite
+    hikari:
+      maximum-pool-size: 1
+      connectionTimeout: 60000
+      idleTimeout: 600000
+      maxLifetime: 3600000
+  jpa:
+    database-platform: com.enigmabridge.hibernate.dialect.SQLiteDialect
+    properties:
+      hibernate:
+        dialect: com.enigmabridge.hibernate.dialect.SQLiteDialect
+        format_sql: true
+spring.jpa.properties.hibernate.jdbc.lob.non_contextual_creation: true
+spring.jpa.properties.hibernate.dialect: com.enigmabridge.hibernate.dialect.SQLiteDialect
+spring.jpa.hibernate.cache.use_second_level_cache: true
+spring.jpa.hibernate.cache.use_query_cache: true
+spring.jpa.hibernate.cache.region.factory_class: org.hibernate.cache.ehcache.EhCacheRegionFactory
+logging.level.org.hibernate.SQL: DEBUG
+logging.level.org.hibernate.type.descriptor.sql.BasicBinder: TRACE
+shell:
+  out:
+    info: CYAN
+    success: GREEN
+    warning: YELLOW
+    error: RED
+app:
+  esignAPIVersion: v2.1
+  clickAPIVersion: v1
+  roomsAPIVersion: v2
+  clmAPIVersion: v201411
+  clmAuthAPIVersion: v201606
+  clickAPIEndPoint: clickapi
+  clmAPIUserEndPoint: apiuser
+  esignAPIAccountUsersEndpoint: users
+  esignAPIDocumentsEndpoint: documents
+  orgAdminAPIBaseUrl: https://api-d.docusign.net/management/v2/organizations
+  roomsAPIBaseUrl: https://demo.rooms.docusign.com/restapi
+  clmAPIBaseUrl: https://apina11.springcm.com
+  clmAuthAPIBaseUrl: https://authuat.springcm.com/api
+  totalRowsPerProcess: 100
+  apiThresholdLimitPercent: 20
+  ruleEngineJsonFilePath: src/test/resources/config/ruleEngine.json
+  createTablesJsonFilePath: src/test/resources/config/createTables.json
+  async:
+    executornameprefix: DSExecutor-
+    corepoolsize: 10
+    maxpoolsize: 50
+    queuecapacity: 9999999
+  db:
+    auditorname: ReportApp
+  authorization:
+    rsaPrivateKeyPath: src/test/resources/config/ds-private.key
+    rsaPublicKeyPath: src/test/resources/config/ds-public.key
+    aud: account-d.docusign.com
+    integratorKey: 4a571161-05ee-4812-83d0-da7ff5c2eab9
+    scopes: impersonation signature organization_read permission_read domain_read user_read user_write
+    userId: 51828699-9931-49e9-8426-79dcf3796dd3
+    token:
+      expirationSeconds: 3600
+      cacheExpirationSeconds: 1800
+    testtoken: null
+  test:
+    csvPath: C:\\cbs\\csv
